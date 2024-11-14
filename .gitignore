@@ -6,3 +6,9 @@ venv
 *.pyc
 *.pyo
 __pycache__/
+
+
+#docker
+.dockerignore
+docker-compose.yml
+Dockerfile
