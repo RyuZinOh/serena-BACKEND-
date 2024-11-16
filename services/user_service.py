@@ -65,3 +65,26 @@ def login_user(data):
         return {'message': 'Login successful', 'user': user_data, 'token': token}, 200
     else:
         return {'message': 'Invalid email or password'}, 401
+    
+
+
+def handle_forgot_password(data):
+    email = data['email']
+    securityQues = data['securityQues']
+    new_password = data['newPassword']
+
+   
+    user_collection = mongo.db.users
+    user = user_collection.find_one({'email': email})
+
+    if not user:
+        return {'message': 'User with this email does not exist.'}, 404
+
+    if user['securityQues'] != securityQues:
+        return {'message': 'Incorrect security question answer.'}, 400
+
+    hashed_password = generate_password_hash(new_password)
+
+    user_collection.update_one({'email': email}, {'$set': {'password': hashed_password}})
+
+    return {'message': 'Password updated successfully.'}, 200
