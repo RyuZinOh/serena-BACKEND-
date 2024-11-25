@@ -88,7 +88,7 @@ Ensure the following variables are set in the `.env` file:
   "phone": "1234567890",
   "address": "123 Main St",
   "securityQues": "What is your pet's name?",
-  "role": "user"  // 1 for admin, 0 for regular user
+  "role": "user" // 1 for admin, 0 for regular user
 }
 ```
 
@@ -142,9 +142,16 @@ Ensure the following variables are set in the `.env` file:
 
 - For subsequent requests, pass the JWT token in the `Authorization` header as follows:
 
-   ```
-   Authorization: Bearer <your_token_here>
-   ```
+  ```
+  Authorization: Bearer <your_token_here>
+  ```
 
 You can use Postman or similar tools to test this setup and implement secure routes.
+
+### note
+The admin user is created manually and does not have a separate login route. Admins log in through the existing /user/login endpoint under the user route. Validation for admin-specific actions is handled using the is_admin middleware, which checks the role value in the user’s record to determine if they have administrative privileges.
+
+Additionally, while the is_admin middleware has been recently added, the existing user routes were already secured with other mechanisms prior to this change. Therefore, no modifications have been made to the previous routes, and they continue to operate as originally implemented. The middleware applies to admin-specific routes only.
+
+This approach ensures compatibility with the pre-existing architecture while maintaining security for admin operations.
 
