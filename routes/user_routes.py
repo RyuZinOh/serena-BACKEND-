@@ -44,7 +44,6 @@ def get_user_role(user_id):
     return response, status
 
 
-
 ## pokemon section
 @user_bp.route('/<user_id>/add-pokemon', methods=['POST'])
 def add_pokemon_route(user_id):
