@@ -5,9 +5,10 @@ from config import Config
 from db import mongo
 from bson import ObjectId
 from flask import Blueprint, request, jsonify
+from flask_cors import CORS
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
-
+CORS(auth_bp)
 
 def require_sign_in(f):
     @wraps(f)

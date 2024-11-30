@@ -5,7 +5,6 @@ from db import mongo  # Import mongo from db.py
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
 
 app.config.from_object(Config)
 

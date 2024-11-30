@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_cors import CORS
 
 from services.user_service import (
     register_user,
@@ -13,6 +14,7 @@ from services.user_service import (
 
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
+CORS(user_bp)
 
 ##user section
 @user_bp.route('/register', methods=['POST'])
