@@ -4,6 +4,7 @@ import jwt
 from config import Config
 from db import mongo
 from bson import ObjectId
+from flask_cors import CORS
 
 def is_admin(f):
     @wraps(f)
