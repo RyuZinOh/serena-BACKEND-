@@ -2,8 +2,7 @@ from flask import Flask
 from flask_marshmallow import Marshmallow
 from config import Config
 from db import mongo  # Import mongo from db.py
-from flask_cors import CORS
-
+from keep_alive import keep_alive # import keep_al from keep_al
 app = Flask(__name__)
 
 app.config.from_object(Config)
@@ -27,3 +26,6 @@ app.register_blueprint(admin_bp)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
+
+
+keep_alive()
