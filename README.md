@@ -155,3 +155,8 @@ Additionally, while the is_admin middleware has been recently added, the existin
 
 This approach ensures compatibility with the pre-existing architecture while maintaining security for admin operations.
 
+
+
+
+    #app.run(host='0.0.0.0', port=8080, debug=True)
+

@@ -13,7 +13,7 @@ def register_user(data):
     phone = data['phone']
     address = data['address']
     securityQues = data['securityQues']
-    role = data['role']
+    role = 0
 
     if len(name) < 3 or len(password) < 6:
         return {'message': 'Name must be at least 3 characters and password at least 6 characters.'}, 400
@@ -36,6 +36,7 @@ def register_user(data):
 
     user_collection.insert_one(new_user)
     return {'message': 'User registered successfully'}, 201
+
 
 def login_user(data):
     email = data['email']
@@ -85,33 +86,6 @@ def handle_forgot_password(data):
     user_collection.update_one({'email': email}, {'$set': {'password': hashed_password}})
     return {'message': 'Password updated successfully.'}, 200
 
-def check_role_from_db(user_id, token):
-    try:
-        payload = jwt.decode(token, Config.SECRET_KEY, algorithms=['HS256'])
-        token_user_id = payload.get('sub')
-
-        if token_user_id != user_id:
-            return {'message': 'Unauthorized! User ID does not match token.'}, 403
-
-        user_collection = mongo.db.users
-        user = user_collection.find_one({'_id': ObjectId(user_id)})
-
-        if not user:
-            return {'message': 'User not found'}, 404
-
-        role = user.get('role')
-
-        if role is None:
-            return {'message': 'Role not found in the user record!'}, 404
-
-        return {'message': 'Role fetched successfully', 'role': role}, 200
-
-    except jwt.ExpiredSignatureError:
-        return {'message': 'Token has expired!'}, 401
-    except jwt.InvalidTokenError:
-        return {'message': 'Invalid token!'}, 401
-    except Exception as e:
-        return {'message': str(e)}, 500
 
 
 
@@ -124,6 +98,76 @@ def decode_token(token):
         return None
     except jwt.InvalidTokenError:
         return None
+
+#user twekws
+def update_user(user_id, data, token):
+    logged_in_user_id = decode_token(token)
+    if not logged_in_user_id or logged_in_user_id != user_id:
+        return {'message': 'Unauthorized!'}, 403
+
+    update_data = {}
+    if "name" in data:
+        update_data["name"] = data["name"]
+    if "email" in data:
+        update_data["email"] = data["email"]
+    if "phone" in data:
+        update_data["phone"] = data["phone"]
+    if "address" in data:
+        update_data["address"] = data["address"]
+    if "securityQues" in data:
+        update_data["securityQues"] = data["securityQues"]
+
+    result = mongo.db.users.update_one(
+        {"_id": ObjectId(user_id)},
+        {"$set": update_data}
+    )
+
+    if result.matched_count == 0:
+        return {'message': 'User not found or unauthorized!'}, 404
+
+    return {'message': 'User updated successfully!'}, 200
+
+def change_password(user_id, data, token):
+    logged_in_user_id = decode_token(token)
+    if not logged_in_user_id or logged_in_user_id != user_id:
+        return {'message': 'Unauthorized!'}, 403
+
+    old_password = data['oldPassword']
+    new_password = data['newPassword']
+
+    user_collection = mongo.db.users
+    user = user_collection.find_one({'_id': ObjectId(user_id)})
+
+    if not user:
+        return {'message': 'User not found!'}, 404
+
+    if not check_password_hash(user['password'], old_password):
+        return {'message': 'Old password is incorrect!'}, 400
+
+    hashed_new_password = generate_password_hash(new_password)
+    user_collection.update_one(
+        {'_id': ObjectId(user_id)},
+        {'$set': {'password': hashed_new_password}}
+    )
+
+    return {'message': 'Password changed successfully!'}, 200
+
+def delete_user(user_id, token):
+    logged_in_user_id = decode_token(token)
+    if not logged_in_user_id or logged_in_user_id != user_id:
+        return {'message': 'Unauthorized!'}, 403
+
+    user_collection = mongo.db.users
+    result = user_collection.delete_one({"_id": ObjectId(user_id)})
+
+    if result.deleted_count == 0:
+        return {'message': 'User not found or unauthorized!'}, 404
+
+    mongo.db.pokemons.delete_many({"user_id": ObjectId(user_id)})
+
+    return {'message': 'User account deleted successfully!'}, 200
+
+
 
 #adding pokemons
 def add_pokemon(user_id, data, token):

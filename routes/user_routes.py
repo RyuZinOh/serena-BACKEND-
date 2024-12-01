@@ -5,11 +5,13 @@ from services.user_service import (
     register_user,
     login_user,
     handle_forgot_password,
-    check_role_from_db,
     add_pokemon,
     list_pokemons,
     update_pokemon,
-    delete_pokemon
+    delete_pokemon,
+    update_user,
+    change_password,
+    delete_user
 )
 
 
@@ -35,13 +37,26 @@ def forgot_password():
     response, status = handle_forgot_password(data)
     return jsonify(response), status
 
-@user_bp.route('/<user_id>/role', methods=['GET'])
-def get_user_role(user_id):
+@user_bp.route('/<user_id>/update', methods=['PUT'])
+def update_user_route(user_id):
     token = request.headers.get('Authorization')
-    if not token:
-        return {'message': 'Token is missing!'}, 401
-    response, status = check_role_from_db(user_id, token)
-    return response, status
+    data = request.get_json()
+    response, status = update_user(user_id, data, token)
+    return jsonify(response), status
+
+@user_bp.route('/<user_id>/change-password', methods=['PUT'])
+def change_password_route(user_id):
+    token = request.headers.get('Authorization')
+    data = request.get_json()
+    response, status = change_password(user_id, data, token)
+    return jsonify(response), status
+
+@user_bp.route('/<user_id>/delete', methods=['DELETE'])
+def delete_user_route(user_id):
+    token = request.headers.get('Authorization')
+    response, status = delete_user(user_id, token)
+    return jsonify(response), status
+
 
 
 ## pokemon section

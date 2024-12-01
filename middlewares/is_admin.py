@@ -5,7 +5,6 @@ from config import Config
 from db import mongo
 from bson import ObjectId
 
-
 def is_admin(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
