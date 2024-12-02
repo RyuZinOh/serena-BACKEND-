@@ -4,6 +4,7 @@ import jwt
 from config import Config
 from db import mongo
 from bson import ObjectId
+from middlewares.is_admin import is_admin
 from flask import Blueprint, request, jsonify
 from flask_cors import CORS
 
@@ -49,6 +50,24 @@ def user_auth():
     return jsonify({
         'ok': True,
         'user': {
+            'id': str(user['_id']),
+            'name': user['name'],
+            'email': user['email'],
+            'phone': user['phone'],
+            'address': user['address']
+        }
+    }), 200
+
+
+
+@auth_bp.route('/admin-auth', methods=['GET'])
+@require_sign_in
+@is_admin
+def admin_auth():
+    user = request.user
+    return jsonify({
+        'ok': True,
+        'admin': {
             'id': str(user['_id']),
             'name': user['name'],
             'email': user['email'],
