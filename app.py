@@ -23,7 +23,13 @@ app.register_blueprint(auth_bp)
 from routes.admin_routes import admin_bp
 app.register_blueprint(admin_bp)
 
+
+# pokempn spawner
+from routes.pokemon_spawner import pokemon_spawner_bp
+app.register_blueprint(pokemon_spawner_bp)
+
+
 if __name__ == '__main__':
      app.run(host='0.0.0.0', port=8080, debug=True)
-    # app.run(debug=True)
+   # app.run(debug=True)
    
