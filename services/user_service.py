@@ -168,44 +168,7 @@ def delete_user(user_id, token):
     return {'message': 'User account deleted successfully!'}, 200
 
 
-
-# #adding pokemons
-# def add_pokemon(user_id, data, token):
-#     logged_in_user_id = decode_token(token)
-#     if not logged_in_user_id:
-#         return {'message': 'Invalid or expired token!'}, 401
-
-#     if logged_in_user_id != user_id:
-#         return {'message': 'Unauthorized!'}, 403
-
-#     name = data.get('name')
-#     types = data.get('types', [])
-#     sprite = data.get('sprite')
-#     iv = data.get('iv', {})
-
-#     if not name or not sprite:
-#         return {'message': 'Name and sprite are required!'}, 400
-
-#     pokemon = {
-#         "user_id": ObjectId(user_id),
-#         "name": name,
-#         "types": types,
-#         "sprite": sprite,
-#         "iv": {
-#             "hp": iv.get('hp', 0),
-#             "attack": iv.get('attack', 0),
-#             "defense": iv.get('defense', 0),
-#             "special_attack": iv.get('special_attack', 0),
-#             "special_defense": iv.get('special_defense', 0),
-#             "speed": iv.get('speed', 0)
-#         }
-#     }
-
-#     mongo.db.pokemons.insert_one(pokemon)
-#     return {'message': 'Pokemon added successfully!'}, 201
-
-
-#Getting users pokemon
+# @get pokemons
 def list_pokemons(user_id, token):
     logged_in_user_id = decode_token(token)
     if not logged_in_user_id or logged_in_user_id != user_id:
@@ -218,40 +181,7 @@ def list_pokemons(user_id, token):
 
     return {'message': 'Pokemons retrieved successfully!', 'pokemons': pokemons}, 200
 
-# #Updatin it
-# def update_pokemon(user_id, pokemon_id, data, token):
-#     logged_in_user_id = decode_token(token)
-#     if not logged_in_user_id or logged_in_user_id != user_id:
-#         return {'message': 'Unauthorized!'}, 403
-
-#     update_data = {}
-#     if "name" in data:
-#         update_data["name"] = data["name"]
-#     if "types" in data:
-#         update_data["types"] = data["types"]
-#     if "sprite" in data:
-#         update_data["sprite"] = data["sprite"]
-#     if "iv" in data:
-#         update_data["iv"] = {
-#             "hp": data["iv"].get("hp", 0),
-#             "attack": data["iv"].get("attack", 0),
-#             "defense": data["iv"].get("defense", 0),
-#             "special_attack": data["iv"].get("special_attack", 0),
-#             "special_defense": data["iv"].get("special_defense", 0),
-#             "speed": data["iv"].get("speed", 0),
-#         }
-
-#     result = mongo.db.pokemons.update_one(
-#         {"_id": ObjectId(pokemon_id), "user_id": ObjectId(user_id)},
-#         {"$set": update_data}
-#     )
-
-#     if result.matched_count == 0:
-#         return {'message': 'Pokemon not found or unauthorized!'}, 404
-
-#     return {'message': 'Pokemon updated successfully!'}, 200
-
-#deleitng pokemons
+#delet pokes
 def delete_pokemon(user_id, pokemon_id, token):
     logged_in_user_id = decode_token(token)
     if not logged_in_user_id or logged_in_user_id != user_id:

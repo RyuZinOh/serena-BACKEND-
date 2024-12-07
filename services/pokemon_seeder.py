@@ -1,8 +1,5 @@
 import random
-
-pokemon_names = ["Pikachu", "Bulbasaur", "Charmander", "Squirtle", "Eevee", "Snorlax", "Jigglypuff", "Meowth", "Pidgey", "Magikarp"]
-
-pokemon_types = ["Fire", "Water", "Grass", "Electric", "Psychic", "Normal", "Fairy", "Fighting", "Dark", "Ghost"]
+import requests
 
 def generate_random_iv():
     return {
@@ -15,19 +12,26 @@ def generate_random_iv():
     }
 
 def spawn_random_pokemon():
-    name = random.choice(pokemon_names)
+    random_id = random.randint(1, 898)
+    print(f"Generated random ID: {random_id}") 
+
+    url = f"https://pokeapi.co/api/v2/pokemon/{random_id}"
+    response = requests.get(url)
     
-    types = random.sample(pokemon_types, k=random.randint(1, 2))
-    
-    iv = generate_random_iv()
+    if response.status_code == 200:
+        data = response.json()
+        name = data['name'].capitalize()
+        types = [t['type']['name'].capitalize() for t in data['types']]
+        iv = generate_random_iv()
+        sprite = data['sprites']['front_default']
+        
+        pokemon = {
+            "name": name,
+            "types": types,
+            "sprite": sprite,
+            "iv": iv
+        }
 
-    sprite = f"https://img.pokemondb.net/sprites/diamond-pearl/normal/{name.lower()}.png"
-
-    pokemon = {
-        "name": name,
-        "types": types,
-        "sprite": sprite,
-        "iv": iv
-    }
-
-    return {"message": "Random Pokemon spawned successfully!", "pokemon": pokemon}, 200
+        return {"message": "Random Pokemon spawned successfully!", "pokemon": pokemon}, 200
+    else:
+        return {"error": "Failed to fetch data from PokeAPI."}, 500
