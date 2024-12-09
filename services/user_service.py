@@ -59,7 +59,7 @@ def login_user(data):
         payload = {
             'sub': str(user['_id']),
             'name': user['name'],
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(weeks=1)
         }
 
         token = jwt.encode(payload, Config.SECRET_KEY, algorithm='HS256')
