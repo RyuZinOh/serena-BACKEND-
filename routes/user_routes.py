@@ -18,12 +18,14 @@ from services.user_service import (
 user_bp = Blueprint('user', __name__, url_prefix='/user')
 CORS(user_bp)
 
-##user section
 @user_bp.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    response, status = register_user(data)
+    data = request.get_json() 
+    file = request.files.get('photo')
+    response, status = register_user(data, file)
     return jsonify(response), status
+
+
 
 @user_bp.route('/login', methods=['POST'])
 def login():

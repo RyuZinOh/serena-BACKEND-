@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_marshmallow import Marshmallow
 from config import Config
-from db import mongo  # Import mongo from db.py
+from db import mongo  
 app = Flask(__name__)
 
 app.config.from_object(Config)
@@ -29,7 +29,12 @@ from routes.pokemon_spawner import pokemon_spawner_bp
 app.register_blueprint(pokemon_spawner_bp)
 
 
+##currency
+from routes.currency_users import currency_bp
+app.register_blueprint(currency_bp)
+
+
 if __name__ == '__main__':
-     app.run(host='0.0.0.0', port=8080, debug=True)
-    #app.run(debug=True)
+     #app.run(host='0.0.0.0', port=8080, debug=True)
+     app.run(debug=True)
    
