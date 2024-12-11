@@ -1,19 +1,15 @@
 from db import mongo
-import base64
 
 def get_user_currency(user_id):
-    currency = mongo.db.currency.find_one({"user_id": user_id})
-
-    if currency:
-        coin_logo = currency.get("coin_logo")
+    currency = mongo.db.currency.find_one(
+        {"user_id": user_id},
+        {"coin_logo": 0}  # Exclude coin_logo field
+    )
     
-        if isinstance(coin_logo, bytes):
-            coin_logo = base64.b64encode(coin_logo).decode('utf-8')
-
+    if currency:
         return {
             "coin_name": currency.get("coin_name"),
-            "coin_value": currency.get("serenex_balance"),
-            "coin_logo": coin_logo  
+            "coin_value": currency.get("serenex_balance")
         }
-
+    
     return None
