@@ -1,10 +1,7 @@
 from db import mongo
 
 def get_user_currency(user_id):
-    currency = mongo.db.currency.find_one(
-        {"user_id": user_id},
-        {"coin_logo": 0}  # Exclude coin_logo field
-    )
+    currency = mongo.db.currency.find_one({"user_id": user_id})
     
     if currency:
         return {
@@ -13,3 +10,4 @@ def get_user_currency(user_id):
         }
     
     return None
+

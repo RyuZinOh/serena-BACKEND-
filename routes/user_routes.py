@@ -20,10 +20,10 @@ CORS(user_bp)
 
 @user_bp.route('/register', methods=['POST'])
 def register():
-    data = request.get_json() 
-    file = request.files.get('photo')
-    response, status = register_user(data, file)
+    data = request.get_json()
+    response, status = register_user(data)
     return jsonify(response), status
+
 
 
 

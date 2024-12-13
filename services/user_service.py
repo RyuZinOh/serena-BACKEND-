@@ -8,7 +8,7 @@ import base64
 import requests
 from bson import Binary
 
-def register_user(data, file):
+def register_user(data):
     name = data['name']
     email = data['email']
     password = data['password']
@@ -38,37 +38,22 @@ def register_user(data, file):
 
     result = user_collection.insert_one(new_user)
     user_id = str(result.inserted_id)
-    initialize_user_currency(user_id, file)
+
+    initialize_user_currency(user_id)
 
     return {'message': 'User registered successfully'}, 201
 
 
-
-def initialize_user_currency(user_id, file):
-    coin_logo_url = "https://github.com/RyuZinOh/static-assets/blob/main/serenex.png?raw=true"
-    response = requests.get(coin_logo_url)
-    
-    if response.status_code == 200:
-        file_data = response.content
-        file_name = "serenex.png"
-        file_content_type = "image/png"
-    else:
-        file_data = None
-        file_name = None
-        file_content_type = None
-
+def initialize_user_currency(user_id):
     user_currency = {
         "user_id": user_id,
         "serenex_balance": 100,
-        "coin_name": "Serenex",
-        "coin_logo": {
-            "data": Binary(file_data),
-            "filename": file_name,
-            "content_type": file_content_type
-        }
+        "coin_name": "Serenex"
     }
 
     mongo.db.currency.insert_one(user_currency)
+
+
 
 
 
