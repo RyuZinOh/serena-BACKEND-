@@ -16,6 +16,7 @@ The **Flask Backend with JWT Authentication** provides a robust and secure backe
 - **Admin Privileges**: Admin user with CRUD (Create, Read, Update, Delete) privileges for managing users and Pokémon.
 - **Pokémon Catching System**: Users can catch Pokémon and manage their collection.
 - **Currency System**: A system for managing in-game currency retrieval.
+- **Market System**: A market showcasing upload/retrive for now for custum pokemons with custom ivs.
 
 
 
