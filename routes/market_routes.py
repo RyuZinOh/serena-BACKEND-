@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import CORS
 import jwt
-from services.market_service import add_pokemon_to_market, get_all_pokemons_in_market
+from services.market_service import add_pokemon_to_market, get_all_pokemons_in_market, buy_pokemon, get_user_owned_pokemons
 from config import Config
 from middlewares.is_admin import is_admin
 import os
@@ -54,5 +54,50 @@ def get_all_market_pokemons():
     try:
         response, status = get_all_pokemons_in_market()
         return jsonify(response), status
+    except Exception as e:
+        return jsonify({'message': str(e)}), 400
+
+
+
+##Buying pkemons for users
+@market_bp.route('/buy/<pokemon_id>', methods=['POST'])
+def buy_market_item(pokemon_id):
+    try:
+        token = request.headers.get('Authorization', "").replace("Bearer ", "")
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 401
+
+        decoded_token = jwt.decode(token, Config.SECRET_KEY, algorithms=['HS256'])
+        buyer_id = decoded_token.get('sub')
+
+        response, status = buy_pokemon(pokemon_id, buyer_id)
+        return jsonify(response), status
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token has expired!'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Invalid token!'}), 401
+    except Exception as e:
+        return jsonify({'message': str(e)}), 400
+
+
+##explicit user ownes
+@market_bp.route('/owned', methods=['GET'])
+def get_owned_pokemons():
+    try:
+        token = request.headers.get('Authorization', "").replace("Bearer ", "")
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 401
+
+        decoded_token = jwt.decode(token, Config.SECRET_KEY, algorithms=['HS256'])
+        user_id = decoded_token.get('sub')
+
+        response, status = get_user_owned_pokemons(user_id)
+        return jsonify(response), status
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token has expired!'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Invalid token!'}), 401
     except Exception as e:
         return jsonify({'message': str(e)}), 400
