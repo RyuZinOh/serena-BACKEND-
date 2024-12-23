@@ -256,24 +256,24 @@ def get_profile_picture(token):
     return Response(user_pfp["pfp_file"], content_type="image/jpeg")
 
 
-def update_profile_picture(image_file, token):
-    logged_in_user_id = decode_token(token)
-    if not logged_in_user_id:
-        return {'message': 'Unauthorized!'}, 403
+# def update_profile_picture(image_file, token):
+#     logged_in_user_id = decode_token(token)
+#     if not logged_in_user_id:
+#         return {'message': 'Unauthorized!'}, 403
 
-    if not image_file or not allowed_file(image_file.filename):
-        return {'message': 'Invalid image file. Only jpg, jpeg, and png are allowed.'}, 400
+#     if not image_file or not allowed_file(image_file.filename):
+#         return {'message': 'Invalid image file. Only jpg, jpeg, and png are allowed.'}, 400
 
-    try:
-        image_data = image_file.read()
-        mongo.db.alluserpfp.update_one(
-            {"user_id": logged_in_user_id},
-            {"$set": {"pfp_file": Binary(image_data)}}
-        )
+#     try:
+#         image_data = image_file.read()
+#         mongo.db.alluserpfp.update_one(
+#             {"user_id": logged_in_user_id},
+#             {"$set": {"pfp_file": Binary(image_data)}}
+#         )
 
-        return {'message': 'Profile picture updated successfully!'}, 200
-    except Exception as e:
-        return {'message': f'Error updating image: {str(e)}'}, 500
+#         return {'message': 'Profile picture updated successfully!'}, 200
+#     except Exception as e:
+#         return {'message': f'Error updating image: {str(e)}'}, 500
 
 def delete_profile_picture(token):
     logged_in_user_id = decode_token(token)

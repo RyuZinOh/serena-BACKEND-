@@ -15,7 +15,7 @@ from services.user_service import (
     upload_profile_picture,
     get_profile_picture,
     delete_profile_picture,
-    update_profile_picture
+    # update_profile_picture
 )
 
 
@@ -124,19 +124,19 @@ def get_pfp():
         return jsonify(response), 404
 
 
-@user_bp.route('/updatepfp', methods=['PUT'])
-def update_pfp():
-    token = request.headers.get('Authorization')
-    if not token:
-        return jsonify({'message': 'Authorization token is required.'}), 400
+# @user_bp.route('/updatepfp', methods=['PUT'])
+# def update_pfp():
+#     token = request.headers.get('Authorization')
+#     if not token:
+#         return jsonify({'message': 'Authorization token is required.'}), 400
 
-    image_file = request.files.get('file')
+#     image_file = request.files.get('file')
     
-    if not image_file:
-        return jsonify({'message': 'No file part'}), 400
+#     if not image_file:
+#         return jsonify({'message': 'No file part'}), 400
 
-    response, status = update_profile_picture(image_file, token)
-    return jsonify(response), status
+#     response, status = update_profile_picture(image_file, token)
+#     return jsonify(response), status
 
 @user_bp.route('/deletepfp', methods=['DELETE'])
 def delete_pfp():
