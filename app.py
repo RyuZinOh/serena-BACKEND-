@@ -38,10 +38,12 @@ app.register_blueprint(currency_bp)
 from routes.market_routes import market_bp
 app.register_blueprint(market_bp)
 
-
+#3 gettin my internet asset
+from routes.global_fire import kamehameha_bp
+app.register_blueprint(kamehameha_bp)
 
 
 if __name__ == '__main__':
-     app.run(host='0.0.0.0', port=8080, debug=True)
-     #app.run(debug=True)
+     #app.run(host='0.0.0.0', port=8080, debug=True)
+     app.run(debug=True)
    
