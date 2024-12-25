@@ -4,8 +4,11 @@ from config import Config
 from db import mongo  
 
 app = Flask(__name__)
-
 app.config.from_object(Config)
+
+@app.route('/')
+def home():
+    return 'serena is running'
 
 mongo.init_app(app)
 ma = Marshmallow(app)
@@ -44,6 +47,6 @@ app.register_blueprint(kamehameha_bp)
 
 
 if __name__ == '__main__':
-     app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)
     #app.run(debug=True)
    
