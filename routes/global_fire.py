@@ -71,20 +71,20 @@ def list_cards():
     cards = merge_metadata(CARD_BASE_URL, cards_data, cards_list)
     return jsonify({"message": "Cards retrieved successfully", "cards": cards}), 200
 
-# Specific card route
-@kamehameha_bp.route('/card/<image_name>', methods=['GET'])
-def get_card(image_name):
-    if image_name in cards_list:
-        details = cards_data.get(image_name, ["Description yet to be added.", "Price yet to be added."])
-        description = details[0] if len(details) > 0 else "Description yet to be added."
-        price = details[1] if len(details) > 1 else "Price yet to be added."
-        url = f"{CARD_BASE_URL}{image_name}"
-        return jsonify({
-            "message": "Card retrieved successfully",
-            "name": image_name,
-            "url": url,
-            "description": description,
-            "price": price
-        }), 200
-    else:
-        return jsonify({"message": "Card not found."}), 404
+# # Specific card route
+# @kamehameha_bp.route('/card/<image_name>', methods=['GET'])
+# def get_card(image_name):
+#     if image_name in cards_list:
+#         details = cards_data.get(image_name, ["Description yet to be added.", "Price yet to be added."])
+#         description = details[0] if len(details) > 0 else "Description yet to be added."
+#         price = details[1] if len(details) > 1 else "Price yet to be added."
+#         url = f"{CARD_BASE_URL}{image_name}"
+#         return jsonify({
+#             "message": "Card retrieved successfully",
+#             "name": image_name,
+#             "url": url,
+#             "description": description,
+#             "price": price
+#         }), 200
+#     else:
+#         return jsonify({"message": "Card not found."}), 404
