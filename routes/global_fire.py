@@ -10,9 +10,10 @@ from services.profiling_comps import (
     backgrounds_list,
     cards_list,
 )
+from flask_cors import CORS
 
 kamehameha_bp = Blueprint('kamehameha', __name__, url_prefix='/kamehameha')
-
+CORS(kamehameha_bp)
 @kamehameha_bp.route('/background', methods=['GET'])
 def list_backgrounds():
     return jsonify({"message": "Backgrounds retrieved successfully", "backgrounds": merge_metadata(BACKGROUND_BASE_URL, backgrounds_data, backgrounds_list)}), 200
