@@ -58,8 +58,6 @@ def user_auth():
         }
     }), 200
 
-
-
 @auth_bp.route('/admin-auth', methods=['GET'])
 @require_sign_in
 @is_admin

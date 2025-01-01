@@ -8,6 +8,9 @@ from services.profiling_comps import (
     cards_data,
     backgrounds_list,
     cards_list,
+    get_background_by_name,
+    get_card_by_name,
+    get_specific_title
 )
 from flask_cors import CORS
 
@@ -21,6 +24,7 @@ def create_item_response(base_url, predefined_data, metadata_list, item_type):
         item_type: merge_metadata(base_url, predefined_data, metadata_list)
     }), 200
 
+#as a whole
 @kamehameha_bp.route('/background', methods=['GET'])
 def list_backgrounds():
     return create_item_response(BACKGROUND_BASE_URL, backgrounds_data, backgrounds_list, "backgrounds")
@@ -35,3 +39,17 @@ def list_titles():
         "message": "Titles retrieved successfully",
         "titles": get_titles()
     }), 200
+
+#single
+@kamehameha_bp.route('/background/<background_name>', methods=['GET'])
+def get_specific_background(background_name):
+    return get_background_by_name(background_name)
+
+@kamehameha_bp.route('/card/<card_name>', methods=['GET'])
+def get_specific_card(card_name):
+    return get_card_by_name(card_name)
+
+
+@kamehameha_bp.route('/title/<int:title_id>', methods=['GET'])
+def get_specific_title_route(title_id):
+    return get_specific_title(title_id)
