@@ -17,6 +17,7 @@ The **Flask Backend with JWT Authentication** provides a robust and secure backe
 - **Pokémon Catching System**: Users can catch Pokémon and manage their collection.
 - **Currency System**: A system for managing in-game currency retrieval.
 - **Market System**: A market showcasing upload/retrive for now for custum pokemons with custom ivs.
+- **profileing system**: A profile managing system for anyone to create their profile and flex maong other users.
 
 
 
