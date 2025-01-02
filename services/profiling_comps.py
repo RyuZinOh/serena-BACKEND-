@@ -111,3 +111,19 @@ def get_card_by_name(card_name):
             "error": "The specified card does not exist"
         }), 404
 
+def get_json_bg(background_name):
+    background_name_without_extension = background_name.split('.')[0]
+    background_info = next(
+        (item for item in merge_metadata(BACKGROUND_BASE_URL, backgrounds_data, backgrounds_list) if item['name'].split('.')[0] == background_name_without_extension),
+        None
+    )
+    return background_info
+
+
+def get_json_card(card_name):
+    card_name_without_extension = card_name.split('.')[0]
+    card_info = next(
+        (item for item in merge_metadata(CARD_BASE_URL, cards_data, cards_list) if item['name'].split('.')[0] == card_name_without_extension),
+        None
+    )
+    return card_info
