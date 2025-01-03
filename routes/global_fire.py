@@ -68,7 +68,6 @@ def get_specific_title_route(title_id):
 
 
 #buying implementation
-
 @kamehameha_bp.route('/buy_title/<int:title_id>', methods=['POST'])
 def buy_title(title_id):
     token = request.headers.get('Authorization', "").replace("Bearer ", "")
@@ -93,19 +92,22 @@ def buy_title(title_id):
     if user_currency.get("coin_value") < title_price:
         return jsonify({'message': f'Insufficient currency! Required: {title_price}, Available: {user_currency.get("coin_value")}'}), 400
 
-    mongo.db.p_title.insert_one({
-        "user_id": user_id,
-        "user_name": decoded_token.get('name'),
-        "title_id": title_id,
-        "title_name": title['name'],
-        "purchased_at": datetime.datetime.now()
-    })
+    mongo.db.p_title.update_one(
+        {"user_id": user_id},
+        {
+            "$set": {
+                "user_name": decoded_token.get('name'),
+                "title_id": title_id,
+                "title_name": title['name'],
+                "purchased_at": datetime.datetime.now()
+            }
+        },
+        upsert=True
+    )
 
     mongo.db.currency.update_one({"user_id": user_id}, {"$inc": {"serenex_balance": -title_price}})
 
     return jsonify({'message': 'Title purchased successfully!'}), 200
-
-
 
 
 
@@ -137,17 +139,21 @@ def buy_background(background_name):
 
     background_url = background_info['url']
 
-    mongo.db.p_bg.insert_one({
-        "user_id": user_id,
-        "user_name": decoded_token.get('name'),
-        "background_url": background_url,
-        "purchased_at": datetime.datetime.now()
-    })
+    mongo.db.p_bg.update_one(
+        {"user_id": user_id},
+        {
+            "$set": {
+                "user_name": decoded_token.get('name'),
+                "background_url": background_url,
+                "purchased_at": datetime.datetime.now()
+            }
+        },
+        upsert=True  
+    )
 
     mongo.db.currency.update_one({"user_id": user_id}, {"$inc": {"serenex_balance": -background_price}})
 
     return jsonify({'message': 'Background purchased successfully!'}), 200
-
 
 @kamehameha_bp.route('/buy_card/<card_name>', methods=['POST'])
 def buy_card(card_name):
@@ -177,13 +183,47 @@ def buy_card(card_name):
 
     card_url = card_info['url']
 
-    mongo.db.p_card.insert_one({
-        "user_id": user_id,
-        "user_name": decoded_token.get('name'),
-        "card_url": card_url,
-        "purchased_at": datetime.datetime.now()
-    })
+    mongo.db.p_card.update_one(
+        {"user_id": user_id},
+        {
+            "$set": {
+                "user_name": decoded_token.get('name'),
+                "card_url": card_url,
+                "purchased_at": datetime.datetime.now()
+            }
+        },
+        upsert=True 
+    )
 
     mongo.db.currency.update_one({"user_id": user_id}, {"$inc": {"serenex_balance": -card_price}})
 
     return jsonify({'message': 'Card purchased successfully!'}), 200
+
+
+#profile viewing
+@kamehameha_bp.route('/profile', methods=['GET'])
+def profile():
+    token = request.headers.get('Authorization', "").replace("Bearer ", "")
+    if not token:
+        return jsonify({'message': 'Token is missing!'}), 401
+
+    try:
+        decoded_token = jwt.decode(token, Config.SECRET_KEY, algorithms=['HS256'])
+        user_id = decoded_token.get('sub')
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token has expired!'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Invalid token!'}), 401
+
+    title_info = mongo.db.p_title.find_one({"user_id": user_id})
+    background_info = mongo.db.p_bg.find_one({"user_id": user_id})
+    card_info = mongo.db.p_card.find_one({"user_id": user_id})
+
+    profile_data = {
+        "username": decoded_token.get('name'),
+        "title_name": title_info.get('title_name') if title_info else None,
+        "background_url": background_info.get('background_url') if background_info else None,
+        "card_url": card_info.get('card_url') if card_info else None
+    }
+
+    return jsonify(profile_data), 200
