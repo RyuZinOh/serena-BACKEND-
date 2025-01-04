@@ -2,6 +2,8 @@ import requests
 from flask import Response, jsonify
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
+import matplotlib.font_manager as fm
+
 
 from services.user_service import get_profile_picture
 
@@ -79,7 +81,7 @@ def get_predefined_items(type_key):
     
     return merge_metadata(f"{CARD_BASE_URL if type_key == 'cards' else BACKGROUND_BASE_URL}", predefined_items, item_list)
 
-
+##using a font matplob library
 def get_background_by_name(background_name):
     background_name_without_extension = background_name.split('.')[0]
     background_info = next(
@@ -145,8 +147,8 @@ def get_json_card(card_name):
 
 
 
-#from image processor  modular code
-def generate_profile_image(token, username, title_name, background_url=None, card_url=None):
+
+def generate_profile_image(token, username, title_name, background_url=None, card_url=None, output_format="PNG"):
     canvas_width, canvas_height = 1440, 992
     upper_height = 595
     lower_height = canvas_height - upper_height
@@ -208,19 +210,24 @@ def generate_profile_image(token, username, title_name, background_url=None, car
     title_text = title_name if title_name else "N/A"
     username_text = username
 
+    # Use matplotlib to find system fonts
     try:
-        font_path = "arial.ttf"
+        font_path = fm.findSystemFonts(fontpaths=None, fontext='ttf')[0]  # Adjust path if necessary
         title_font = ImageFont.truetype(font_path, 40)
         username_font = ImageFont.truetype(font_path, 60)
-    except IOError:
+    except Exception:
         title_font = ImageFont.load_default()
         username_font = ImageFont.load_default()
 
     draw.text((365, upper_height - 2), username_text, fill="black", font=username_font)
     draw.text((365, upper_height + 50), title_text, fill="black", font=title_font)
 
+    # Convert to RGB mode before saving as JPEG
+    if output_format == "JPEG":
+        background = background.convert("RGB")  # Convert to RGB to save as JPEG
+
     img_io = BytesIO()
-    background.save(img_io, 'PNG')
+    background.save(img_io, format=output_format)
     img_io.seek(0)
 
     return img_io
