@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, send_file
 from services.currency_service import get_user_currency
 from services.profiling_comps import (
     merge_metadata,
@@ -14,7 +14,8 @@ from services.profiling_comps import (
     get_specific_title,
     get_title_by_id,
     get_json_bg,
-    get_json_card
+    get_json_card,
+    generate_profile_image
 )
 from flask_cors import CORS
 from db import mongo
@@ -227,3 +228,33 @@ def profile():
     }
 
     return jsonify(profile_data), 200
+
+
+##generating profile 
+@kamehameha_bp.route('/generate_profile', methods=['GET'])
+def generate_profile():
+    token = request.headers.get('Authorization', "").replace("Bearer ", "")
+    if not token:
+        return jsonify({'message': 'Token is missing!'}), 401
+
+    try:
+        decoded_token = jwt.decode(token, Config.SECRET_KEY, algorithms=['HS256'])
+        user_id = decoded_token.get('sub')
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token has expired!'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Invalid token!'}), 401
+
+    title_info = mongo.db.p_title.find_one({"user_id": user_id})
+    background_info = mongo.db.p_bg.find_one({"user_id": user_id})
+    card_info = mongo.db.p_card.find_one({"user_id": user_id})
+
+    username = decoded_token.get('name')
+    title_name = title_info.get('title_name') if title_info else "No Title"
+    background_url = background_info.get('background_url') if background_info else None
+    card_url = card_info.get('card_url') if card_info else None
+
+    
+    img_io = generate_profile_image(token, username, title_name, background_url, card_url)
+
+    return send_file(img_io, mimetype='image/png')

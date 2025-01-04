@@ -1,5 +1,10 @@
 import requests
-from flask import jsonify
+from flask import Response, jsonify
+from PIL import Image, ImageDraw, ImageFont
+from io import BytesIO
+
+from services.user_service import get_profile_picture
+
 
 # Constants
 BACKGROUND_BASE_URL = "https://raw.githubusercontent.com/RyuZinOh/static-assets/main/Backgrounds/"
@@ -127,3 +132,95 @@ def get_json_card(card_name):
         None
     )
     return card_info
+
+
+
+
+
+
+
+
+
+
+
+
+
+#from image processor  modular code
+def generate_profile_image(token, username, title_name, background_url=None, card_url=None):
+    canvas_width, canvas_height = 1440, 992
+    upper_height = 595
+    lower_height = canvas_height - upper_height
+
+    background = Image.new('RGBA', (canvas_width, canvas_height), (255, 255, 255, 255))
+
+    if background_url:
+        try:
+            bg_image = Image.open(requests.get(background_url, stream=True).raw).convert("RGBA")
+            width_percent = (upper_height / float(bg_image.size[1]))
+            new_width = int(float(bg_image.size[0]) * width_percent)
+            bg_image = bg_image.resize((new_width, upper_height))
+            background.paste(bg_image, (0, 0))
+        except Exception:
+            pass
+
+    draw = ImageDraw.Draw(background)
+    draw.line([(0, upper_height), (canvas_width, upper_height)], fill="black", width=2)
+    draw.rectangle([(0, upper_height), (canvas_width, canvas_height)], fill="white")
+
+    profile_picture = None
+    pfp_response = get_profile_picture(token)
+    if isinstance(pfp_response, Response) and pfp_response.status_code == 200:
+        profile_picture = pfp_response.get_data()
+
+    if profile_picture:
+        try:
+            avatar = Image.open(BytesIO(profile_picture)).convert("RGBA").resize((300, 300))
+            mask = Image.new('L', avatar.size, 0)
+            draw_mask = ImageDraw.Draw(mask)
+            draw_mask.ellipse((0, 0, 300, 300), fill=255)
+            circular_avatar = Image.new('RGBA', avatar.size)
+            circular_avatar.paste(avatar, (0, 0), mask)
+
+            avatar_top_y = upper_height - 150
+            background.paste(circular_avatar, (50, avatar_top_y), circular_avatar)
+        except Exception:
+            pass
+
+    if card_url:
+        try:
+            card_image = Image.open(requests.get(card_url, stream=True).raw).convert("RGBA").resize((390, 690))
+            tilted_card = card_image.rotate(-10, expand=True)
+            card_x = 900
+            card_y = 94
+            background.paste(tilted_card, (card_x, card_y), tilted_card)
+        except Exception:
+            pass
+
+    try:
+        dragon_shadow = Image.open(requests.get("https://github.com/RyuZinOh/static-assets/blob/main/archieved/dragon_shadow.png?raw=true", stream=True).raw).convert("RGBA")
+        dragon_shadow = dragon_shadow.resize((150, 150))
+        dragon_shadow_x = 50 + (300 - 150) // 2
+        dragon_shadow_y = upper_height + 200
+        background.paste(dragon_shadow, (dragon_shadow_x, dragon_shadow_y), dragon_shadow)
+    except Exception:
+        pass
+
+    title_text = title_name if title_name else "N/A"
+    username_text = username
+
+    try:
+        font_path = "arial.ttf"
+        title_font = ImageFont.truetype(font_path, 40)
+        username_font = ImageFont.truetype(font_path, 60)
+    except IOError:
+        title_font = ImageFont.load_default()
+        username_font = ImageFont.load_default()
+
+    draw.text((365, upper_height - 2), username_text, fill="black", font=username_font)
+    draw.text((365, upper_height + 50), title_text, fill="black", font=title_font)
+
+    img_io = BytesIO()
+    background.save(img_io, 'PNG')
+    img_io.seek(0)
+
+    return img_io
