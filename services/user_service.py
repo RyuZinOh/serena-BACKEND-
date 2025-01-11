@@ -119,99 +119,6 @@ def decode_token(token):
     except jwt.InvalidTokenError:
         return None
 
-# #user twekws
-# def update_user(user_id, data, token):
-#     logged_in_user_id = decode_token(token)
-#     if not logged_in_user_id or logged_in_user_id != user_id:
-#         return {'message': 'Unauthorized!'}, 403
-
-#     update_data = {}
-#     if "name" in data:
-#         update_data["name"] = data["name"]
-#     if "email" in data:
-#         update_data["email"] = data["email"]
-#     if "phone" in data:
-#         update_data["phone"] = data["phone"]
-#     if "address" in data:
-#         update_data["address"] = data["address"]
-#     if "securityQues" in data:
-#         update_data["securityQues"] = data["securityQues"]
-
-#     result = mongo.db.users.update_one(
-#         {"_id": ObjectId(user_id)},
-#         {"$set": update_data}
-#     )
-
-#     if result.matched_count == 0:
-#         return {'message': 'User not found or unauthorized!'}, 404
-
-#     return {'message': 'User updated successfully!'}, 200
-
-# def change_password(user_id, data, token):
-#     logged_in_user_id = decode_token(token)
-#     if not logged_in_user_id or logged_in_user_id != user_id:
-#         return {'message': 'Unauthorized!'}, 403
-
-#     old_password = data['oldPassword']
-#     new_password = data['newPassword']
-
-#     user_collection = mongo.db.users
-#     user = user_collection.find_one({'_id': ObjectId(user_id)})
-
-#     if not user:
-#         return {'message': 'User not found!'}, 404
-
-#     if not check_password_hash(user['password'], old_password):
-#         return {'message': 'Old password is incorrect!'}, 400
-
-#     hashed_new_password = generate_password_hash(new_password)
-#     user_collection.update_one(
-#         {'_id': ObjectId(user_id)},
-#         {'$set': {'password': hashed_new_password}}
-#     )
-
-#     return {'message': 'Password changed successfully!'}, 200
-
-# def delete_user(user_id, token):
-#     logged_in_user_id = decode_token(token)
-#     if not logged_in_user_id or logged_in_user_id != user_id:
-#         return {'message': 'Unauthorized!'}, 403
-
-#     user_collection = mongo.db.users
-#     result = user_collection.delete_one({"_id": ObjectId(user_id)})
-
-#     if result.deleted_count == 0:
-#         return {'message': 'User not found or unauthorized!'}, 404
-
-#     mongo.db.pokemons.delete_many({"user_id": ObjectId(user_id)})
-
-#     return {'message': 'User account deleted successfully!'}, 200
-
-
-# @get pokemons
-def list_pokemons(user_id, token):
-    logged_in_user_id = decode_token(token)
-    if not logged_in_user_id or logged_in_user_id != user_id:
-        return {'message': 'Unauthorized!'}, 403
-
-    pokemons = list(mongo.db.pokemons.find({"user_id": ObjectId(user_id)}))
-    for pokemon in pokemons:
-        pokemon["_id"] = str(pokemon["_id"])
-        pokemon["user_id"] = str(pokemon["user_id"])
-
-    return {'message': 'Pokemons retrieved successfully!', 'pokemons': pokemons}, 200
-
-#delet pokes
-def delete_pokemon(user_id, pokemon_id, token):
-    logged_in_user_id = decode_token(token)
-    if not logged_in_user_id or logged_in_user_id != user_id:
-        return {'message': 'Unauthorized!'}, 403
-
-    result = mongo.db.pokemons.delete_one({"_id": ObjectId(pokemon_id), "user_id": ObjectId(user_id)})
-    if result.deleted_count == 0:
-        return {'message': 'Pokemon not found or unauthorized!'}, 404
-
-    return {'message': 'Pokemon deleted successfully!'}, 200
 
 
 
@@ -255,25 +162,6 @@ def get_profile_picture(token):
 
     return Response(user_pfp["pfp_file"], content_type="image/jpeg")
 
-
-# def update_profile_picture(image_file, token):
-#     logged_in_user_id = decode_token(token)
-#     if not logged_in_user_id:
-#         return {'message': 'Unauthorized!'}, 403
-
-#     if not image_file or not allowed_file(image_file.filename):
-#         return {'message': 'Invalid image file. Only jpg, jpeg, and png are allowed.'}, 400
-
-#     try:
-#         image_data = image_file.read()
-#         mongo.db.alluserpfp.update_one(
-#             {"user_id": logged_in_user_id},
-#             {"$set": {"pfp_file": Binary(image_data)}}
-#         )
-
-#         return {'message': 'Profile picture updated successfully!'}, 200
-#     except Exception as e:
-#         return {'message': f'Error updating image: {str(e)}'}, 500
 
 def delete_profile_picture(token):
     logged_in_user_id = decode_token(token)
