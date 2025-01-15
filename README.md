@@ -18,7 +18,7 @@ The **Flask Backend with JWT Authentication** provides a robust and secure backe
 - **Currency System**: A system for managing in-game currency retrieval.
 - **Market System**: A market showcasing upload/retrive for now for custum pokemons with custom ivs.
 - **profiling system**: A profile managing system for anyone to create their profile and flex Among other users.
-
+- **Chat system**: A dynamic chat feature that facilitates realTime messaging without saving users data or chat logs to prioritize user privacy
 
 
 ## 📬 Contact
