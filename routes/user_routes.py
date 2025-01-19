@@ -88,3 +88,5 @@ def delete_pfp():
 
     response, status = delete_profile_picture(token)
     return jsonify(response), status
+
+

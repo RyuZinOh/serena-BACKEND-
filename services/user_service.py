@@ -177,3 +177,9 @@ def delete_profile_picture(token):
         return {'message': 'Profile picture deleted successfully!'}, 200
     except Exception as e:
         return {'message': f'Error deleting image: {str(e)}'}, 500
+    
+
+
+
+
+

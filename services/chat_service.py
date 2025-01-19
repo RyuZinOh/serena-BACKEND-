@@ -1,6 +1,7 @@
 from flask import request
 from extensions import socketio
 from services.user_service import decode_token
+from db import mongo
 
 def authorize_request():
     token = request.headers.get('Authorization')
@@ -24,5 +25,20 @@ def handle_message(data):
     if not user_id:
         return
 
+    socketio.emit('message', {
+        'text': data['text'],
+        'timestamp': data['timestamp'],
+        'sender': data['sender'],
+        'sender_id': user_id,
+
+    })
+
     print(f"Message received from {user_id}: {data}")
-    socketio.emit('message', {'text': data['text'], 'timestamp': data['timestamp'], 'sender': data['sender'], 'channel': data['channel']})
+
+
+
+def get_public_profile_picture(user_id):
+    user_pfp = mongo.db.alluserpfp.find_one({"user_id": user_id})
+    if not user_pfp or not user_pfp.get("pfp_file"):
+        return None  #
+    return user_pfp["pfp_file"]
